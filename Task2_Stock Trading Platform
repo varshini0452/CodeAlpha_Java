@@ -1,0 +1,121 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+class Stock{
+    String symbol;
+    double price;
+    Stock(String symbol,double price){
+        this.symbol=symbol;
+        this.price=price;
+    }
+}
+class PortfolioItem{
+    Stock stock;
+    int quantity;
+    PortfolioItem(Stock stock,int quantity){
+        this.stock=stock;
+        this.quantity=quantity;
+    }
+}
+class User{
+    double balance;
+    ArrayList<PortfolioItem> portfolio=new ArrayList<>();
+    User(double balance){
+        this.balance=balance;
+    }
+    void buyStock(Stock stock,int quantity){
+        double cost=stock.price*quantity;
+        if(cost>balance){
+            System.out.println("Not enough balance");
+            return;
+        }
+        balance-=cost;
+        portfolio.add(new PortfolioItem(stock,quantity));
+        System.out.println("Stock purchased successfully");
+    }
+
+    void sellStock(int index){
+        if(index<0||index>=portfolio.size()){
+            System.out.println("Invalid selection");
+            return;
+        }
+        PortfolioItem item=portfolio.remove(index);
+        balance+=item.stock.price*item.quantity;
+        System.out.println("Stock sold successfully");
+    }
+
+    void viewPortfolio(){
+        if(portfolio.isEmpty()){
+            System.out.println("Portfolio is empty");
+            return;
+        }
+        System.out.println("\nYour Portfolio:");
+        for(int i=0;i<portfolio.size();i++){
+            PortfolioItem p=portfolio.get(i);
+            System.out.println((i+1)+". "+p.stock.symbol+
+                    " | Qty: "+p.quantity+
+                    " | Price: "+p.stock.price);
+        }
+    }
+}
+
+public class Task2{
+    public static void main(String[] args){
+        Scanner sc=new Scanner(System.in);
+        Stock[] marketStocks={
+                new Stock("AAPL",150),
+                new Stock("GOOG",2800),
+                new Stock("TSLA",700),
+                new Stock("AMZN",3300)
+        };
+        User user=new User(10000);
+        while(true){
+            System.out.println("   STOCK TRADING PLATFORM");
+            System.out.println("Balance: $" + user.balance);
+            System.out.println("1. View Stocks");
+            System.out.println("2. Buy Stock");
+            System.out.println("3. Sell Stock");
+            System.out.println("4. View Portfolio");
+            System.out.println("5. Exit");
+            System.out.print("Choose option: ");
+
+            int choice=sc.nextInt();
+
+            if(choice==1){
+                System.out.println("\nMarket Stocks:");
+                for(int i=0;i<marketStocks.length;i++){
+                    System.out.println((i+1)+". "+
+                            marketStocks[i].symbol+
+                            " - $"+marketStocks[i].price);
+                }
+            }
+            else if(choice==2){
+                System.out.print("Enter stock number: ");
+                int s=sc.nextInt()-1;
+                System.out.print("Enter quantity: ");
+                int q=sc.nextInt();
+                if(s>=0&&s<marketStocks.length){
+                    user.buyStock(marketStocks[s],q);
+                }else{
+                    System.out.println("Invalid stock choice");
+                }
+            }
+            else if(choice==3){
+                user.viewPortfolio();
+                System.out.print("Enter stock number to sell: ");
+                int s=sc.nextInt()-1;
+                user.sellStock(s);
+            }
+            else if(choice==4){
+                user.viewPortfolio();
+            }
+            else if(choice==5){
+                System.out.println("Exiting platform");
+                sc.close();
+                break;
+            }
+            else{
+                System.out.println("Invalid option");
+            }
+        }
+    }
+}
